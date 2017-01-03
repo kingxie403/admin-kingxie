@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lte.dao.SysUserDao">
+    <resultMap id="BaseResultMap" type="com.lte.entity.SysUser">
+        <id column="user_id" property="userId" jdbcType="INTEGER"/>
+        <result column="user_name" property="userName" jdbcType="VARCHAR"/>
+        <result column="password" property="password" jdbcType="VARCHAR"/>
+        <result column="email" property="email" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <resultMap id="rolesResultMap" type="com.lte.entity.SysRole">
+        <id column="role_id" property="roleId" jdbcType="INTEGER"/>
+        <result column="role_name" property="roleName" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <insert id="saveUser" parameterType="com.lte.entity.SysUser">
+        INSERT  INTO sys_user (user_name,password,email,create_date,update_date)
+          VALUES (#{userName},#{password},#{email},#{createDate},#{updateDate})
+    </insert>
+    <update id="updateUser" parameterType="com.lte.entity.SysUser">
+        UPDATE sys_user t set t.email = #{email} ,t.password = #{password} WHERE t.user_id = #{userId}
+    </update>
+    <delete id="deleteUser" parameterType="java.lang.Integer">
+        DELETE FROM sys_user  WHERE user_id = #{userId}
+    </delete>
+    <select id="findByUserName" parameterType="java.lang.String" resultType="com.lte.entity.SysUser">
+        SELECT * FROM sys_user t WHERE t.user_name = #{userName}
+    </select>
+
+    <select id="existUser" parameterType="com.lte.entity.SysUser" resultType="java.lang.Boolean">
+        <![CDATA[SELECT COUNT(t.user_id) FROM sys_user t
+              WHERE t.user_name=#{userName} AND t.password = #{password}]]>
+    </select>
+
+    <select id="findLikeUserName" parameterType="java.lang.String" resultMap="BaseResultMap">
+        SELECT * FROM sys_user WHERE 1=1
+        <if test="userName != null and userName !=''">
+            AND user_name LIKE concat(concat('%','${userName}','%'))
+        </if>
+        ORDER BY user_id
+    </select>
+    <select id="findById" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        SELECT * FROM sys_user t WHERE  t.user_id = #{userId}
+    </select>
+    <select id="findRoleByUser" parameterType="java.lang.Integer" resultMap="rolesResultMap">
+        SELECT
+            t3.*
+        FROM
+            sys_user t1,
+            sys_user_ref_role t2,
+            sys_role t3
+        WHERE
+            t1.user_id = t2.user_id
+        AND t2.role_id = t3.ROLE_ID
+        AND t1.user_id = #{userId}
+          UNION
+        SELECT
+            t5.*
+        FROM
+            sys_user t1,
+            sys_user_group_ref_user t2,
+            sys_user_group t3,
+            sys_user_group_ref_role t4,
+            sys_role t5
+        WHERE
+            t1.user_id = t2.user_id
+        AND t2.user_group_id = t3.group_id
+        AND t3.group_id = t4.user_group_id
+        AND t4.role_id = t5.ROLE_ID
+        AND t1.user_id = #{userId};
+
+    </select>
+</mapper>

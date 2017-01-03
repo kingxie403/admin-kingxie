@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lte.dao.SysMenuDao">
+    <resultMap id="baseResultMap" type="com.lte.entity.SysMenu">
+        <id column="menu_id" property="menuId" jdbcType="INTEGER"/>
+        <result column="menu_name" property="menuName" jdbcType="VARCHAR"/>
+        <result column="menu_url" property="menuUrl" jdbcType="VARCHAR"/>
+        <result column="menu_parent" property="menuParent" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <insert id="saveMenu" parameterType="com.lte.entity.SysMenu">
+        INSERT INTO sys_menu (menu_name,menu_url,menu_icon,menu_parent) VALUES (#{menuName},#{menuUrl},#{menuIcon},#{menuParent})
+    </insert>
+
+    <delete id="deleteMenu" parameterType="com.lte.entity.SysMenu">
+        DELETE FROM  sys_menu WHERE menu_id=#{menuId}
+    </delete>
+
+    <update id="updateMenu" parameterType="com.lte.entity.SysMenu">
+        UPDATE  sys_menu SET menu_name=#{menuName},menu_url=#{menuUrl},menu_icon=#{menuIcon} WHERE menu_id=#{menuId}
+    </update>
+
+    <select id="queryAll" resultMap="baseResultMap">
+        SELECT * FROM sys_menu;
+    </select>
+
+    <select id="queryById" parameterType="java.lang.Integer" resultMap="baseResultMap">
+        SELECT * FROM sys_menu t WHERE t.menu_id=#{menuId};
+    </select>
+
+    <select id="queryForUser" parameterType="java.lang.String" resultMap="baseResultMap">
+        SELECT
+	    t7.*
+        FROM
+            sys_user t1,
+            sys_user_ref_role t2,
+            sys_role t3,
+            sys_role_ref_pri t4,
+            sys_privilege t5,
+            sys_pri_ref_menu t6,
+            sys_menu t7
+        WHERE
+            t1.user_id = t2.user_id
+            AND t2.role_id = t3.ROLE_ID
+            AND t3.ROLE_ID = t4.role_id
+            AND t4.pri_id = t5.PRI_ID
+            AND t5.PRI_ID = t6.PRI_ID
+            AND t6.MENU_ID=t7.MENU_ID
+            AND t1.user_name = #{userName}
+    </select>
+
+    <select id="queryForGroup" parameterType="java.lang.String" resultMap="baseResultMap">
+        SELECT
+            t9.*
+        FROM
+            sys_user t1,
+            sys_user_group_ref_user t2,
+            sys_user_group t3,
+            sys_user_group_ref_role t4,
+            sys_role t5,
+            sys_role_ref_pri t6,
+            sys_privilege t7,
+            sys_pri_ref_menu t8,
+            sys_menu t9
+        WHERE
+            t1.user_id = t2.user_id
+            AND t2.user_group_id = t3.group_id
+            AND t3.group_id = t4.user_group_id
+            AND t4.role_id = t5.ROLE_ID
+            AND t5.ROLE_ID = t6.role_id
+            AND t6.pri_id = t7.PRI_ID
+            AND t7.PRI_ID = t8.PRI_ID
+            AND t8.MENU_ID = t9.MENU_ID
+            AND t1.user_name = #{userName}
+    </select>
+</mapper>

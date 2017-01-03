@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<definitions id="definitions"
+             targetNamespace="http://activiti.org/bpmn20"
+             xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:activiti="http://activiti.org/bpmn">
+
+    <process id="userAndGroupInUserTask" name="simple BPM">
+        <startEvent id="startEvent" name="start"/>
+        <userTask id="studyUserAndGroupInUserTask" name="学习用户与组在用户任务中的应用" activiti:candidateGroups="deptLeader"/>
+        <sequenceFlow id="flow1" sourceRef="startEvent" targetRef="studyUserAndGroupInUserTask"/>
+        <endEvent id="endEvent" name="end"/>
+        <sequenceFlow id="flow2" sourceRef="studyUserAndGroupInUserTask" targetRef="endEvent"/>
+    </process>
+
+</definitions>

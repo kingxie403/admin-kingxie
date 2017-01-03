@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lte.dao.SysDicItemDao">
+    <resultMap id="baseResultMap" type="com.lte.entity.SysDicItem">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="type_id" property="typeId" jdbcType="INTEGER"/>
+        <result column="sort" property="sort" jdbcType="INTEGER"/>
+        <result column="text" property="text" jdbcType="VARCHAR"/>
+        <result column="value" property="value" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <insert id="saveDicItem" parameterType="com.lte.entity.SysDicItem">
+        INSERT INTO sys_dic_item (type_id,sort,text,value) VALUES
+        (#{typeId},#{sort},#{text},#{value})
+    </insert>
+
+    <delete id="deleteDicItem" parameterType="com.lte.entity.SysDicItem">
+        DELETE FROM sys_dic_item t WHERE t.id = #{id}
+    </delete>
+
+    <update id="updateDicItem" parameterType="com.lte.entity.SysDicItem">
+        UPDATE  sys_dic_item SET sort = #{sort},text = #{text},value = #{value} WHERE id=#{id} and type_id#{typeId}
+    </update>
+
+    <select id="queryAll" resultMap="baseResultMap">
+        SELECT * FROM  sys_dic_item
+    </select>
+
+    <select id="queryById" parameterType="java.lang.Integer" resultMap="baseResultMap">
+        SELECT * FROM  sys_dic_item t WHERE t.id=#{dicItemId}
+    </select>
+
+    <select id="queryByTypeId" parameterType="java.lang.Integer" resultMap="baseResultMap">
+        SELECT * FROM  sys_dic_item t WHERE t.type_id=#{dicTypeId}
+    </select>
+
+    <select id="queryByTypeCode" parameterType="java.lang.String" resultMap="baseResultMap">
+        SELECT t1.* FROM sys_dic_item t1,sys_dic_type t2 WHERE t1.TYPE_ID = t2.ID and t2.DIC_CODE=#{dicTypeCode}
+    </select>
+
+    <delete id="deleteByTypeId" parameterType="java.lang.Integer">
+        DELETE t FROM sys_dic_item as t WHERE t.type_id = #{typeId}
+    </delete>
+
+</mapper>

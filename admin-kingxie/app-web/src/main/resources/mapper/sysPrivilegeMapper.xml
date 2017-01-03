@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lte.dao.SysPrivilegeDao">
+    <resultMap id="baseResultMap" type="com.lte.entity.SysPrivilege">
+        <id column="pri_id" property="priId" jdbcType="INTEGER"/>
+        <result column="pri_name" property="priName" jdbcType="VARCHAR"/>
+        <result column="pri_type" property="priType" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <insert id="savePrivilege" parameterType="com.lte.entity.SysPrivilege">
+        INSERT INTO sys_privilege (pri_id,pri_name,pri_type) VALUES (#{priId},#{priName},#{priType})
+    </insert>
+
+    <delete id="deleteSysPrivilege" parameterType="com.lte.entity.SysPrivilege">
+        DELETE FROM sys_privilege WHERE pri_id = #{priId}
+    </delete>
+
+    <update id="updateSysPrivilege" parameterType="com.lte.entity.SysPrivilege">
+        UPDATE  sys_privilege t SET t.pri_name=#{priName},t.pri_type=#{priType} WHERE t.pri_id=#{priId}
+    </update>
+
+    <select id="queryAll" resultMap="baseResultMap">
+        SELECT * FROM sys_privilege
+    </select>
+    <select id="queryByName" parameterType="java.lang.String" resultMap="baseResultMap">
+        SELECT * FROM sys_privilege t WHERE  1=1
+        <if test="privilegeName != '' and privilegeName != null">
+            AND t.pri_name LIKE concat(concat('%','${privilegeName}','%'))
+        </if>
+    </select>
+    <select id="queryById" parameterType="java.lang.Integer" resultType="com.lte.entity.SysPrivilege">
+        SELECT * FROM sys_privilege t WHERE t.pri_id = #{priId}
+    </select>
+</mapper>

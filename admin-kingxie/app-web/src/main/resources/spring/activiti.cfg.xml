@@ -1,0 +1,50 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans   http://www.springframework.org/schema/beans/spring-beans.xsd">
+    <import resource="spring.xml"/>
+
+    <!-- 引擎内部提供的UUID生成器，依赖fastxml的java-uuid-generator模块 -->
+    <bean id="uuidGenerator" class="org.activiti.engine.impl.persistence.StrongUuidGenerator" />
+    <!-- Activiti处理引擎的配置，交由Spring管理 -->
+    <bean id="processEngineConfiguration" class="org.activiti.spring.SpringProcessEngineConfiguration">
+        <property name="jdbcUrl" value="${jdbc.url}"/>
+        <property name="jdbcDriver" value="${jdbc.driverClassName}"/>
+        <property name="jdbcUsername" value="${jdbc.user}"/>
+        <property name="jdbcPassword" value="${jdbc.password}"/>
+        <property name="databaseSchemaUpdate" value="true" />
+        <property name="jobExecutorActivate" value="false" />
+        <property name="asyncExecutorEnabled" value="true" />
+        <property name="asyncExecutorActivate" value="false" />
+        <!--部署资源，此处可省略，一般从界面上传资源文件配置-->
+        <!--<property name="deploymentResources" value="classpath*:bpm/*.bpmn20.xml"/>-->
+        <!-- 统一的事务管理 -->
+        <property name="transactionManager" ref="transactionManager" />
+        <property name="activityFontName"  value="宋体" />
+        <property name="labelFontName"  value="宋体" />
+        <property name="annotationFontName" value="宋体"/>
+        <property name="customSessionFactories">
+            <list>
+                <bean class="com.lte.activiti.service.CustomUserEntityManagerFactory">
+                    <property name="customUserEntityManager" ref="customUserEntityManager" />
+                </bean>
+                <bean class="com.lte.activiti.service.CustomGroupEntityManagerFactory">
+                    <property name="customGroupEntityManager" ref="customGroupEntityManager"/>
+                </bean>
+            </list>
+        </property>
+    </bean>
+
+    <!-- activity引擎 -->
+    <bean id="processEngine" class="org.activiti.spring.ProcessEngineFactoryBean">
+        <property name="processEngineConfiguration" ref="processEngineConfiguration" />
+    </bean>
+
+    <bean id="repositoryService" factory-bean="processEngine" factory-method="getRepositoryService" />
+    <bean id="identityService" factory-bean="processEngine" factory-method="getIdentityService" />
+    <bean id="runtimeService" factory-bean="processEngine" factory-method="getRuntimeService" />
+    <bean id="taskService" factory-bean="processEngine" factory-method="getTaskService" />
+    <bean id="historyService" factory-bean="processEngine" factory-method="getHistoryService" />
+    <bean id="formService" factory-bean="processEngine" factory-method="getFormService" />
+    <bean id="managementService" factory-bean="processEngine" factory-method="getManagementService" />
+    <bean id="objectMapper" class="com.fasterxml.jackson.databind.ObjectMapper"></bean>
+</beans>

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lte.dao.SysPriRefMenuDao">
+    <resultMap id="baseResultMap" type="com.lte.entity.SysPriRefMenu">
+        <result column="pri_id" property="priId" jdbcType="INTEGER"/>
+        <result column="menu_id" property="menuId" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <insert id="insertSysPriRefMenu" parameterType="com.lte.entity.SysPriRefMenu">
+        INSERT INTO SYS_PRI_REF_MENU (pri_id,menu_id) VALUES (#{priId},#{menuId})
+    </insert>
+
+    <delete id="deleteSysPriRefMenu" parameterType="com.lte.entity.SysPriRefMenu">
+        DELETE FROM SYS_PRI_REF_MENU WHERE pri_id#{priId} AND menu_id=#{menuId}
+    </delete>
+
+    <update id="updateSysPriRefMenu" parameterType="com.lte.entity.SysPriRefMenu">
+        UPDATE SYS_PRI_REF_MENU SET menu_id=#{menuId} WHERE pri_id=#{priId}
+    </update>
+
+    <delete id="deleteAllByPriId" parameterType="java.lang.Integer">
+        DELETE FROM  SYS_PRI_REF_MENU WHERE pri_id=#{priId}
+    </delete>
+    <select id="queryByPriId" parameterType="java.lang.Integer" resultMap="baseResultMap">
+        SELECT * FROM  SYS_PRI_REF_MENU WHERE pri_id=#{priId}
+    </select>
+
+</mapper>

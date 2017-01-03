@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lte.dao.SysDicTypeDao">
+    <resultMap id="baseResultMap" type="com.lte.entity.SysDicType">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="dic_code" property="dicCode" jdbcType="VARCHAR"/>
+        <result column="dic_name" property="dicName" jdbcType="VARCHAR"/>
+        <result column="status" property="status" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <insert id="saveDicType" parameterType="com.lte.entity.SysDicType">
+        INSERT INTO sys_dic_type (dic_code,dic_name,status) VALUES (#{dicCode},#{dicName},#{status})
+    </insert>
+
+    <delete id="deleteDicType" parameterType="com.lte.entity.SysDicType">
+        DELETE FROM sys_dic_type t WHERE t.id = #{id}
+    </delete>
+
+     <update id="updateDicType" parameterType="com.lte.entity.SysDicType">
+         UPDATE  sys_dic_type set dic_code=#{dicCode} , dic_name=#{dicName} , status=#{status} WHERE id=#{id}
+     </update>
+
+     <select id="queryAll" resultMap="baseResultMap">
+         SELECT * FROM   sys_dic_type
+     </select>
+    <select id="queryByName" parameterType="java.lang.String" resultMap="baseResultMap" >
+        SELECT * FROM sys_dic_type t WHERE  1=1
+        <if test="dicTypeName != '' and dicTypeName != null">
+            AND t.dic_name LIKE concat(concat('%','${dicTypeName}','%'))
+        </if>
+    </select>
+    <select id="queryById" parameterType="java.lang.Integer" resultMap="baseResultMap">
+        SELECT * FROM   sys_dic_type t WHERE t.id=#{dicTypeId}
+    </select>
+</mapper>

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lte.dao.SysRoleRefPriDao">
+    <resultMap id="baseResultMap" type="com.lte.entity.SysRoleRefPri">
+        <result column="role_id" property="roleId" jdbcType="INTEGER"/>
+        <result column="pri_id" property="priId" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <insert id="insertSysRoleRefPri" parameterType="com.lte.entity.SysRoleRefPri">
+        INSERT  INTO sys_role_ref_pri (role_id,pri_id) VALUES (#{roleId},#{priId})
+    </insert>
+
+    <delete id="deleteSysRoleRefPri" parameterType="com.lte.entity.SysRoleRefPri">
+        DELETE FROM  sys_role_ref_pri WHERE role_id=#{roleId} AND pri_id = #{priId}
+    </delete>
+
+    <update id="updateSysRoleRefPri" parameterType="com.lte.entity.SysRoleRefPri">
+        UPDATE  sys_role_ref_pri SET pri_id=#{priId} WHERE role_id=#{roleId} AND pri_id=#{priId}
+    </update>
+
+    <delete id="deleteAllByRole" parameterType="java.lang.Integer">
+        DELETE FROM  sys_role_ref_pri WHERE role_id=#{roleId}
+    </delete>
+
+    <select id="queryByRoleId" parameterType="java.lang.Integer" resultMap="baseResultMap">
+        SELECT * FROM sys_role_ref_pri WHERE role_id=#{roleId}
+    </select>
+
+</mapper>

@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+             xmlns:activiti="http://activiti.org/bpmn"
+             xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+             xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC"
+             xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI"
+             typeLanguage="http://www.w3.org/2001/XMLSchema"
+             expressionLanguage="http://www.w3.org/1999/XPath"
+             targetNamespace="http://www.activiti.org/processdef">
+    <process id="leave" isExecutable="true" name="请假流程-动态表单">
+        <startEvent id="startEvent" name="开始" activiti:initiator="applyUserId">
+            <extensionElements>
+                <activiti:formProperty id="startDate" name="请假开始日期" type="date" datePattern="yyyy-MM-dd" required="true"
+                                       readable="true" writable="true"/>
+                <activiti:formProperty id="endDate" name="请假结束日期" type="date" datePattern="yyyy-MM-dd" required="true"
+                                       readable="true" writable="true"/>
+                <activiti:formProperty id="reason" name="请假原因" type="string" required="true" readable="true"
+                                       writable="true"/>
+            </extensionElements>
+        </startEvent>
+
+        <userTask id="deptLeaderAudit" name="部门领导审批" activiti:candidateGroups="deptLeader">
+            <extensionElements>
+                <activiti:formProperty id="startDate" name="请假开始日期" type="date" value="${startDate}"
+                                       datePattern="yyyy-MM-dd" readable="true" writable="false"/>
+                <activiti:formProperty id="endDate" name="请假结束日期" type="date" value="${endDate}"
+                                       datePattern="yyyy-MM-dd" readable="true" writable="false"/>
+                <activiti:formProperty id="reason" name="请假原因" type="string" value="${reason}" readable="true"
+                                       writable="false"/>
+                <activiti:formProperty id="deptLeaderApproved" name="审批意见" type="enum" required="true" writable="true">
+                    <activiti:value id="true" name="同意"></activiti:value>
+                    <activiti:value id="false" name="拒绝"></activiti:value>
+                </activiti:formProperty>
+            </extensionElements>
+        </userTask>
+
+        <sequenceFlow id="folw1" sourceRef="startEvent" targetRef="deptLeaderAudit"></sequenceFlow>                     <!--开始————>部门领导-->
+
+        <exclusiveGateway id="gateway1"></exclusiveGateway>
+
+        <sequenceFlow id="flow2" sourceRef="deptLeaderAudit" targetRef="gateway1"></sequenceFlow>                       <!--部门领导————>网关1-->
+
+        <userTask id="hrAudit" name="人事审批" activiti:candidateGroups="hr">
+            <extensionElements>
+                <activiti:formProperty id="startDate" name="请假开始日期" type="date" value="${startDate}"
+                                       datePattern="yyyy-MM-dd" readable="true" writable="false"/>
+                <activiti:formProperty id="endDate" name="请假结束日期" type="date" value="${endDate}"
+                                       datePattern="yyyy-MM-dd" readable="true" writable="false"/>
+                <activiti:formProperty id="reason" name="请假原因" type="string" value="${reason}" readable="true"
+                                       writable="false"/>
+                <activiti:formProperty id="hrApproved" name="审批意见" type="enum" required="true" writable="true">
+                    <activiti:value id="true" name="同意"></activiti:value>
+                    <activiti:value id="false" name="拒绝"></activiti:value>
+                </activiti:formProperty>
+            </extensionElements>
+        </userTask>
+
+        <sequenceFlow id="flow4" name="同意" sourceRef="gateway1" targetRef="hrAudit">                                  <!--网关1————>同意————>人事审批-->
+            <conditionExpression xsi:type="tFormalExpression">
+                <![CDATA[${deptLeaderApproved == 'true'}]]>
+            </conditionExpression>
+        </sequenceFlow>
+
+        <userTask id="modifyApply" name="调整申请" activiti:assignee="${applyUserId}">
+            <extensionElements>
+                <activiti:formProperty id="startDate" name="请假开始日期" type="date" value="${startDate}"
+                                       datePattern="yyyy-MM-dd" readable="true" writable="true" required="true"/>
+                <activiti:formProperty id="endDate" name="请假结束日期" type="date" value="${endDate}"
+                                       datePattern="yyyy-MM-dd" readable="true" writable="true" required="true"/>
+                <activiti:formProperty id="reason" name="请假原因" type="string" value="${reason}" readable="true"
+                                       writable="true" required="true"/>
+                <activiti:formProperty id="reApply" name="重新申请" type="enum" required="true" writable="true">
+                    <activiti:value id="true" name="重新申请"></activiti:value>
+                    <activiti:value id="false" name="取消申请"></activiti:value>
+                </activiti:formProperty>
+            </extensionElements>
+        </userTask>
+
+        <sequenceFlow id="flow6" name="拒绝" sourceRef="gateway1" targetRef="modifyApply">                              <!--网关1————>拒绝————>调整申请-->
+            <conditionExpression xsi:type="tFormalExpression">
+                <![CDATA[${deptLeaderApproved == 'false'}]]>
+            </conditionExpression>
+        </sequenceFlow>
+
+        <exclusiveGateway id="gateway2"></exclusiveGateway>
+
+        <sequenceFlow id="flow3" sourceRef="hrAudit" targetRef="gateway2"></sequenceFlow>                               <!--人事审批————>网关2-->
+
+        <userTask id="reportBack" name="销假" activiti:assignee="${applyUserId}">
+            <extensionElements>
+                <activiti:formProperty id="startDate" name="请假开始日期" type="date" value="${startDate}"
+                                       datePattern="yyyy-MM-dd" readable="true" writable="false"/>
+                <activiti:formProperty id="endDate" name="请假结束日期" type="date" value="${endDate}"
+                                       datePattern="yyyy-MM-dd" readable="true" writable="false"/>
+                <activiti:formProperty id="reason" name="请假原因" type="string" value="${reason}" readable="true"
+                                       writable="false"/>
+                <activiti:formProperty id="reportBackDate" name="销假日期" type="date" datePattern="yyyy-MM-dd"
+                                       readable="true" writable="true" required="true" default="${endDate}"/>
+            </extensionElements>
+        </userTask>
+
+        <sequenceFlow id="flow5" name="同意" sourceRef="gateway2" targetRef="reportBack">                               <!--网关2————>同意————>销假-->
+            <conditionExpression xsi:type="tFormalExpression">
+                <![CDATA[${hrApproved == 'true'}]]>
+            </conditionExpression>
+        </sequenceFlow>
+
+        <sequenceFlow id="flow8" name="拒绝" sourceRef="gateway2" targetRef="modifyApply">                              <!--网关2————>拒绝————>调整申请-->
+            <conditionExpression xsi:type="tFormalExpression">
+                <![CDATA[${hrApproved == 'false'}]]>
+            </conditionExpression>
+        </sequenceFlow>
+
+        <exclusiveGateway id="gateway3"></exclusiveGateway>
+
+        <sequenceFlow id="flow9" sourceRef="modifyApply" targetRef="gateway3"></sequenceFlow>                           <!--调整申请————>网关3-->
+
+        <textAnnotation id="textAnnotation1">
+            <text>
+                请求被驳回后
+                员工可以选择
+                继续申请或者
+                取消本次申请
+            </text>
+        </textAnnotation>
+        <association id="association1" sourceRef="modifyApply" targetRef="textAnnotation1"
+                     associationDirection="None"></association>
+
+        <sequenceFlow id="flow10" name="结束流程" sourceRef="gateway3" targetRef="endEvnet">                            <!--网关3————>结束流程-->
+            <extensionElements>
+                <activiti:executionListener event="take" expression="${execution.setVariable('result', 'canceled')}"/>
+            </extensionElements>
+            <conditionExpression xsi:type="tFormalExpression">
+                <![CDATA[${reApply == 'false'}]]>
+            </conditionExpression>
+        </sequenceFlow>
+
+        <sequenceFlow id="flow11" name="重新申请" sourceRef="gateway3" targetRef="deptLeaderAudit">                     <!--网关3————>重新申请-->
+            <conditionExpression xsi:type="tFormalExpression">
+                <![CDATA[${reApply == 'true'}]]>
+            </conditionExpression>
+        </sequenceFlow>
+
+        <endEvent id="endEvnet"></endEvent>
+
+        <sequenceFlow id="flow7" sourceRef="reportBack" targetRef="endEvnet">                                           <!--销假————>结束-->
+            <extensionElements>
+                <activiti:executionListener event="take" expression="${execution.setVariable('result', 'ok')}"/>
+            </extensionElements>
+        </sequenceFlow>
+
+
+    </process>
+
+</definitions>

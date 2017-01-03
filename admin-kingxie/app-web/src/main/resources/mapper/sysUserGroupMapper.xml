@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lte.dao.SysUserGroupDao">
+
+    <resultMap id="baseResultMap" type="com.lte.entity.SysUserGroup">
+        <id column="group_id" property="groupId" jdbcType="INTEGER"/>
+        <result column="group_name" property="groupName" jdbcType="VARCHAR"/>
+        <result column="parent_id" property="parentId" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <insert id="saveUserGroup" parameterType="com.lte.entity.SysUserGroup">
+        INSERT INTO sys_user_group (group_name,parent_id) VALUES (#{groupName},#{parentId})
+    </insert>
+
+    <delete id="deleteUserGroup" parameterType="com.lte.entity.SysUserGroup">
+        DELETE FROM  sys_user_group WHERE group_id=#{groupId}
+    </delete>
+
+    <update id="updateUserGroup" parameterType="com.lte.entity.SysUserGroup">
+        UPDATE sys_user_group SET group_name=#{groupName} WHERE group_id = #{groupId}
+    </update>
+
+    <select id="queryAll" resultMap="baseResultMap">
+        SELECT * FROM sys_user_group
+    </select>
+
+    <select id="queryById" resultMap="baseResultMap">
+        SELECT * FROM sys_user_group WHERE group_id=#{groupId}
+    </select>
+</mapper>
